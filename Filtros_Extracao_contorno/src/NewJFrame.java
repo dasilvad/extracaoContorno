@@ -43,6 +43,8 @@ public class NewJFrame extends javax.swing.JFrame {
         jMenu2 = new javax.swing.JMenu();
         jMenuItemFiltroMediana = new javax.swing.JMenuItem();
         jMenuItemExtracaoContorno = new javax.swing.JMenuItem();
+        jMenuItemFiltroRobertsVertical = new javax.swing.JMenuItem();
+        jMenuItemFiltroRobertsHorizontal = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -91,6 +93,22 @@ public class NewJFrame extends javax.swing.JFrame {
             }
         });
         jMenu2.add(jMenuItemExtracaoContorno);
+
+        jMenuItemFiltroRobertsVertical.setText("Filtro Roberts Vertical");
+        jMenuItemFiltroRobertsVertical.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemFiltroRobertsVerticalActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItemFiltroRobertsVertical);
+
+        jMenuItemFiltroRobertsHorizontal.setText("Filtro Roberts Horizontal");
+        jMenuItemFiltroRobertsHorizontal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemFiltroRobertsHorizontalActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItemFiltroRobertsHorizontal);
 
         jMenuBar1.add(jMenu2);
 
@@ -186,7 +204,7 @@ public class NewJFrame extends javax.swing.JFrame {
                 //erosao
         	for (int i = 1; i < (width - 1); i++) {
                     for (int j = 1; j < (height - 1); j++) {                       
-//                     //mascara 3x3
+                      //mascara 3x3
                        int pixel1 = (int) (new Color(imagem1.getRGB(i-1, j-1)).getRed());
                        int pixel2 = (int) (new Color(imagem1.getRGB(i-1, j)).getRed());
                        int pixel3 = (int) (new Color(imagem1.getRGB(i-1, j+1)).getRed());                       
@@ -229,7 +247,6 @@ public class NewJFrame extends javax.swing.JFrame {
         jLabel1.setIcon(icon);
         setSize(imagem1.getWidth() + 25, imagem1.getHeight() + 70);
         
-
     }//GEN-LAST:event_jMenuItemExtracaoContornoActionPerformed
     //retorna imagem1 - imagem2
     private BufferedImage subtrair(BufferedImage imagem1, BufferedImage imagem2) {
@@ -329,6 +346,88 @@ public class NewJFrame extends javax.swing.JFrame {
         
     }//GEN-LAST:event_jMenuItemFiltroMedianaActionPerformed
 
+    private void jMenuItemFiltroRobertsVerticalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemFiltroRobertsVerticalActionPerformed
+        
+        BufferedImage imagemAuxiliar = new BufferedImage(imagem1.getWidth(), 
+                                                                 imagem1.getHeight(), imagem1.getType());
+        int width = imagem1.getWidth();
+        int height = imagem1.getHeight();
+        
+        for (int i = 1; i < (width - 1); i++) {
+            for (int j = 1; j < (height - 1); j++) { 
+                //mascara
+                int pixel1 = new Color(imagem1.getRGB(i-1, j+1)).getRed()*-1;
+                int pixel2 = new Color(imagem1.getRGB(i, j)).getRed();
+                int soma = pixel1+pixel2;
+                
+                Color cor;
+                if (soma < 0){
+                    cor = new Color (0, 0, 0);
+                }else{
+                    cor = new Color (soma, soma, soma);
+                }
+                imagemAuxiliar.setRGB(i, j, cor.getRGB());
+            }
+        }
+        
+        //copia primeira linha e ultima linha da imagem original para a imagem auxiliar
+         for (int x=0; x < width; x++){
+             imagemAuxiliar.setRGB(x, 0, imagem1.getRGB(x, 0));
+             imagemAuxiliar.setRGB(x, imagem1.getHeight() - 1, imagem1.getRGB(x, imagem1.getHeight() - 1));
+         }
+         //copia a primeira e ultima coluna da imagem original para a imagem auxiliar
+         for (int y = 0; y < height; y++){
+             imagemAuxiliar.setRGB(0, y, imagem1.getRGB(0, y));
+             imagemAuxiliar.setRGB(imagem1.getWidth() - 1,  y, imagem1.getRGB(imagem1.getWidth() -1, y));
+         }
+         
+        imagem1 = imagemAuxiliar;
+        ImageIcon icon = new ImageIcon(imagem1);
+        jLabel1.setIcon(icon);
+        setSize(imagem1.getWidth() + 25, imagem1.getHeight() + 70);
+    }//GEN-LAST:event_jMenuItemFiltroRobertsVerticalActionPerformed
+
+    private void jMenuItemFiltroRobertsHorizontalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemFiltroRobertsHorizontalActionPerformed
+        BufferedImage imagemAuxiliar = new BufferedImage(imagem1.getWidth(), 
+                                                                 imagem1.getHeight(), imagem1.getType());
+        int width = imagem1.getWidth();
+        int height = imagem1.getHeight();
+        
+        for (int i = 1; i < (width - 1); i++) {
+            for (int j = 1; j < (height - 1); j++) { 
+                //mascara
+                int pixel1 = new Color(imagem1.getRGB(i-1, j-1)).getRed()*-1;
+                int pixel2 = new Color(imagem1.getRGB(i, j)).getRed();
+                
+                int soma = pixel1+pixel2;
+                
+                Color cor;
+                if (soma < 0){
+                    cor = new Color (0, 0, 0);
+                }else{
+                    cor = new Color (soma, soma, soma);
+                }
+                imagemAuxiliar.setRGB(i, j, cor.getRGB());
+            }
+        }
+        
+        //copia primeira linha e ultima linha da imagem original para a imagem auxiliar
+         for (int x=0; x < width; x++){
+             imagemAuxiliar.setRGB(x, 0, imagem1.getRGB(x, 0));
+             imagemAuxiliar.setRGB(x, imagem1.getHeight() - 1, imagem1.getRGB(x, imagem1.getHeight() - 1));
+         }
+         //copia a primeira e ultima coluna da imagem original para a imagem auxiliar
+         for (int y = 0; y < height; y++){
+             imagemAuxiliar.setRGB(0, y, imagem1.getRGB(0, y));
+             imagemAuxiliar.setRGB(imagem1.getWidth() - 1,  y, imagem1.getRGB(imagem1.getWidth() -1, y));
+         }
+         
+        imagem1 = imagemAuxiliar;
+        ImageIcon icon = new ImageIcon(imagem1);
+        jLabel1.setIcon(icon);
+        setSize(imagem1.getWidth() + 25, imagem1.getHeight() + 70);
+    }//GEN-LAST:event_jMenuItemFiltroRobertsHorizontalActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -373,6 +472,8 @@ public class NewJFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItemExtracaoContorno;
     private javax.swing.JMenuItem jMenuItemFiltroMediana;
+    private javax.swing.JMenuItem jMenuItemFiltroRobertsHorizontal;
+    private javax.swing.JMenuItem jMenuItemFiltroRobertsVertical;
     // End of variables declaration//GEN-END:variables
 
     
