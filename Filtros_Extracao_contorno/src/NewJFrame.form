@@ -40,6 +40,14 @@
             <Property name="text" type="java.lang.String" value="Imagem"/>
           </Properties>
           <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="jMenuItemFiltroMediana">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Filtro Mediana"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItemFiltroMedianaActionPerformed"/>
+              </Events>
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItemExtracaoContorno">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Extracao Contorno"/>

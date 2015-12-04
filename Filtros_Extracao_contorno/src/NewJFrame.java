@@ -12,10 +12,13 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import javax.swing.filechooser.*;
 
 public class NewJFrame extends javax.swing.JFrame {
-     BufferedImage imagem1;
+     BufferedImage imagem1, imagemAuxiliar;
      int flag=0;
    
     public NewJFrame() {
@@ -38,6 +41,7 @@ public class NewJFrame extends javax.swing.JFrame {
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
+        jMenuItemFiltroMediana = new javax.swing.JMenuItem();
         jMenuItemExtracaoContorno = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -71,6 +75,14 @@ public class NewJFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu1);
 
         jMenu2.setText("Imagem");
+
+        jMenuItemFiltroMediana.setText("Filtro Mediana");
+        jMenuItemFiltroMediana.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemFiltroMedianaActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItemFiltroMediana);
 
         jMenuItemExtracaoContorno.setText("Extracao Contorno");
         jMenuItemExtracaoContorno.addActionListener(new java.awt.event.ActionListener() {
@@ -163,7 +175,33 @@ public class NewJFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItemExtracaoContornoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemExtracaoContornoActionPerformed
-        
+//               
+//                imagemAuxiliar = imagem1;
+//                
+//                int width = imagem1.getWidth();
+//        	int height = imagem1.getHeight();
+//                int pixel; 
+//                
+//        	for (int i = 1; i < (width - 1); i++) {
+//                    for (int j = 1; j < (height - 1); j++) { 				
+//                        Color cor = new Color(imagem1.getRGB(i, j));
+//                        pixel = (int) cor.getRed() ;
+//                        
+//                        if ()
+//                        
+//                        
+//                        
+//                        Color color = new Color(pixel, g, b);
+//                        imagemAuxiliar.setRGB(i, j, color.getRGB());
+////                        int r = 255 - (int)((rgb&0x00FF0000)>>>16);
+////        		int g = 255 - (int)((rgb&0x0000FF00)>>>8);
+////        		int b = 255 - (int) (rgb&0x000000FF);
+//        		Color color = new Color(r, g, b);
+//        		imagem1.setRGB(i, j, color.getRGB());
+//        	    }
+//                }
+//                this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+//
 
 
 //        int width = imagem1.getWidth();
@@ -181,6 +219,79 @@ public class NewJFrame extends javax.swing.JFrame {
 //        this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
 
     }//GEN-LAST:event_jMenuItemExtracaoContornoActionPerformed
+
+    public void escalaDeCinza(){
+        int width = imagem1.getWidth();
+        int height = imagem1.getHeight();
+        int y = 0;
+        Color color = null;
+        
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                color = new Color(imagem1.getRGB(i, j));
+                y = (int) ((0.299 * color.getRed()) + (0.587 * color.getGreen()) + 
+                    (0.1147 * color.getBlue()));
+                
+                color = new Color(y, y, y);
+                imagem1.setRGB(i, j, color.getRGB());
+            }
+        }
+        this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+    }
+    private void jMenuItemFiltroMedianaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemFiltroMedianaActionPerformed
+        
+        int width = imagem1.getWidth(),
+        height = imagem1.getHeight();
+        Color color = null;
+    
+//        Mask operations are usually done on gray scale imagem1s
+        this.escalaDeCinza();
+        
+        ArrayList<Color> list= new ArrayList<>();
+        
+//        Skip borders
+	for (int i = 1; i < (width - 1); i++) {
+            for (int j = 1; j < (height - 1); j++) { 
+                color = new Color (imagem1.getRGB(i, j));
+                list.clear();
+                
+//                Add 3x3 mask pixels
+                list.add (new Color(imagem1.getRGB(i-1, j-1)));
+                list.add (new Color(imagem1.getRGB(i-1, j)));
+                list.add (new Color(imagem1.getRGB(i-1, j+1)));
+                list.add (new Color(imagem1.getRGB(i, j-1)));
+                list.add (new Color(imagem1.getRGB(i, j)));
+                list.add (new Color(imagem1.getRGB(i, j+1)));
+                list.add (new Color(imagem1.getRGB(i+1, j-1)));
+                list.add (new Color(imagem1.getRGB(i+1, j)));
+                list.add (new Color(imagem1.getRGB(i+1, j+1)));
+                
+//                Sort mask pixels
+                Collections.sort (list, new Comparator<Color>() {
+
+                    @Override
+                    public int compare(Color color1, Color color2) {
+                        if (color1.getRGB() < color2.getRGB()) {
+                            return -1;
+                        }
+                        else {
+                            if (color1.getRGB() == color2.getRGB()) {
+                                return 0;
+                            }
+                            else {
+                                return 1;
+                            }
+                        }
+                    }
+                });
+            
+                imagem1.setRGB (i, j, list.get(4).getRGB());
+	    }
+        }
+        this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+    
+        
+    }//GEN-LAST:event_jMenuItemFiltroMedianaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -225,5 +336,6 @@ public class NewJFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItemExtracaoContorno;
+    private javax.swing.JMenuItem jMenuItemFiltroMediana;
     // End of variables declaration//GEN-END:variables
 }
