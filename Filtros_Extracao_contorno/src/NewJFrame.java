@@ -18,7 +18,7 @@ import java.util.Comparator;
 import javax.swing.filechooser.*;
 
 public class NewJFrame extends javax.swing.JFrame {
-     BufferedImage imagem1, imagemAuxiliar;
+     BufferedImage imagem1;
      int flag=0;
    
     public NewJFrame() {
@@ -84,7 +84,7 @@ public class NewJFrame extends javax.swing.JFrame {
         });
         jMenu2.add(jMenuItemFiltroMediana);
 
-        jMenuItemExtracaoContorno.setText("Extracao Contorno");
+        jMenuItemExtracaoContorno.setText("Extrair Contorno");
         jMenuItemExtracaoContorno.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemExtracaoContornoActionPerformed(evt);
@@ -174,52 +174,87 @@ public class NewJFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
+    //Extrai os contornos
+    //imagemOriginal - (erosao da imagemOriginal)
     private void jMenuItemExtracaoContornoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemExtracaoContornoActionPerformed
-//               
-//                imagemAuxiliar = imagem1;
-//                
-//                int width = imagem1.getWidth();
-//        	int height = imagem1.getHeight();
-//                int pixel; 
-//                
-//        	for (int i = 1; i < (width - 1); i++) {
-//                    for (int j = 1; j < (height - 1); j++) { 				
-//                        Color cor = new Color(imagem1.getRGB(i, j));
-//                        pixel = (int) cor.getRed() ;
-//                        
-//                        if ()
-//                        
-//                        
-//                        
-//                        Color color = new Color(pixel, g, b);
-//                        imagemAuxiliar.setRGB(i, j, color.getRGB());
-////                        int r = 255 - (int)((rgb&0x00FF0000)>>>16);
-////        		int g = 255 - (int)((rgb&0x0000FF00)>>>8);
-////        		int b = 255 - (int) (rgb&0x000000FF);
-//        		Color color = new Color(r, g, b);
-//        		imagem1.setRGB(i, j, color.getRGB());
-//        	    }
-//                }
-//                this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
-//
+                
+                BufferedImage imagemAuxiliar = new BufferedImage(imagem1.getWidth(), 
+                                                                 imagem1.getHeight(), imagem1.getType());
+                int width = imagem1.getWidth();
+        	int height = imagem1.getHeight();
+                
+                //erosao
+        	for (int i = 1; i < (width - 1); i++) {
+                    for (int j = 1; j < (height - 1); j++) {                       
+//                     //mascara 3x3
+                       int pixel1 = (int) (new Color(imagem1.getRGB(i-1, j-1)).getRed());
+                       int pixel2 = (int) (new Color(imagem1.getRGB(i-1, j)).getRed());
+                       int pixel3 = (int) (new Color(imagem1.getRGB(i-1, j+1)).getRed());                       
+                       int pixel4 = (int) (new Color(imagem1.getRGB(i, j-1)).getRed());
+                       int pixel5 = (int) (new Color(imagem1.getRGB(i, j)).getRed());
+                       int pixel6 = (int) (new Color(imagem1.getRGB(i, j+1)).getRed());
+                       int pixel7 = (int) (new Color(imagem1.getRGB(i+1, j-1)).getRed());
+                       int pixel8 = (int) (new Color(imagem1.getRGB(i+1, j)).getRed());
+                       int pixel9 = (int) (new Color(imagem1.getRGB(i+1, j+1)).getRed());
+                       
+                       Color color;
+                       
+                if (pixel1 == 0 && pixel2 == 0 && pixel3 == 0 && 
+                    pixel4 == 0 && pixel5 == 0 && pixel6 == 0 && 
+                    pixel7 == 0 && pixel8 == 0 && pixel9 == 0){
 
+                    color = new Color(0,0,0 );
+                    
+                }else{
+                    color = new Color(255, 255, 255 );  
+                }
 
-//        int width = imagem1.getWidth();
-//	int height = imagem1.getHeight();
-//	for (int i = 0; i < width; i++) {
-//            for (int j = 0; j < height; j++) { 				
-//                int rgb = imagem1.getRGB(i, j); 				//a cor inversa é dado por 255 menos o valor de cada canal 				
-//                int r = 255 - (int)((rgb&0x00FF0000)>>>16);
-//		int g = 255 - (int)((rgb&0x0000FF00)>>>8);
-//		int b = 255 - (int) (rgb&0x000000FF);
-//		Color color = new Color(r, g, b);
-//		imagem1.setRGB(i, j, color.getRGB());
-//	    }
-//        }
-//        this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+                imagemAuxiliar.setRGB(i, j, color.getRGB());
+             }
+         }
+                
+         //copia primeira linha e ultima linha da imagem original para a imagem auxiliar
+         for (int x=0; x < width; x++){
+             imagemAuxiliar.setRGB(x, 0, imagem1.getRGB(x, 0));
+             imagemAuxiliar.setRGB(x, imagem1.getHeight() - 1, imagem1.getRGB(x, imagem1.getHeight() - 1));
+         }
+         //copia a primeira e ultima coluna da imagem original para a imagem auxiliar
+         for (int y = 0; y < height; y++){
+             imagemAuxiliar.setRGB(0, y, imagem1.getRGB(0, y));
+             imagemAuxiliar.setRGB(imagem1.getWidth() - 1,  y, imagem1.getRGB(imagem1.getWidth() -1, y));
+         }
+         
+        imagem1 = subtrair(imagem1, imagemAuxiliar);
+        ImageIcon icon = new ImageIcon(imagem1);
+        jLabel1.setIcon(icon);
+        setSize(imagem1.getWidth() + 25, imagem1.getHeight() + 70);
+        
 
     }//GEN-LAST:event_jMenuItemExtracaoContornoActionPerformed
-
+    //retorna imagem1 - imagem2
+    private BufferedImage subtrair(BufferedImage imagem1, BufferedImage imagem2) {
+        BufferedImage imagemAuxiliar = new BufferedImage(imagem1.getWidth(), 
+                                                                 imagem1.getHeight(), imagem1.getType());
+        int width = imagem1.getWidth();
+        int height = imagem1.getHeight();
+                
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) { 				
+               int pixel1 = new Color(imagem1.getRGB(i, j)).getRed();
+               int pixel2 = new Color(imagem2.getRGB(i, j)).getRed();
+               int subtracao = pixel2 - pixel1;
+               Color color;
+               if (subtracao < 0){
+                   color = new Color(0,0,0 );
+               }else{
+                   color = new Color(subtracao, subtracao, subtracao );
+               }
+               imagemAuxiliar.setRGB(i, j, color.getRGB());
+	    }
+        }
+        return imagemAuxiliar;
+        
+    }
     public void escalaDeCinza(){
         int width = imagem1.getWidth();
         int height = imagem1.getHeight();
@@ -236,7 +271,8 @@ public class NewJFrame extends javax.swing.JFrame {
                 imagem1.setRGB(i, j, color.getRGB());
             }
         }
-        this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+        
+       this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
     }
     private void jMenuItemFiltroMedianaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemFiltroMedianaActionPerformed
         
@@ -338,4 +374,6 @@ public class NewJFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItemExtracaoContorno;
     private javax.swing.JMenuItem jMenuItemFiltroMediana;
     // End of variables declaration//GEN-END:variables
+
+    
 }

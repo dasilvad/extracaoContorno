@@ -50,7 +50,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItemExtracaoContorno">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Extracao Contorno"/>
+                <Property name="text" type="java.lang.String" value="Extrair Contorno"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItemExtracaoContornoActionPerformed"/>
